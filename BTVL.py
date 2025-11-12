@@ -3,17 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def main():
-    # --- 1. KHAI BÁO BIẾN VÀ NHẬP LIỆU ---
 
     t = sp.symbols('t')
     
     print("--- CHƯƠNG TRÌNH TÍNH TOÁN QUỸ ĐẠO VÀ MOMEN ĐỘNG LƯỢNG ---")
     
-    # Nhập x(t) và y(t)
     x_str = input("Nhập biểu thức cho x(t) (ví dụ: 5*cos(t)): ")
     y_str = input("Nhập biểu thức cho y(t) (ví dụ: 5*sin(t)): ")
     
-    # Nhập các hằng số
     try:
         m_val = float(input("Nhập khối lượng m (ví dụ: 2): "))
     except ValueError:
@@ -21,14 +18,11 @@ def main():
         m_val=1
 
     try:
-        # Biến biểu thức thành sympy
         x_expr = sp.sympify(x_str)
         y_expr = sp.sympify(y_str)
     except sp.SympifyError:
         print("Biểu thức nhập vào không hợp lệ.")
         return
-
-    # --- 2. TÍNH TOÁN HÌNH THỨC (SYMBOLIC) ---
     
     print("--- 2. TÍNH TOÁN SYMBOLIC ---")
 
@@ -37,20 +31,18 @@ def main():
     v_expr = (vx_expr**2 + vy_expr**2)**0.5
     r_expr=(x_expr**2+y_expr**2)**0.5
     cosa_expr=(x_expr*vx_expr+y_expr*vy_expr)/(r_expr*v_expr)
-    if (r_expr*v_expr==0):
+    t_calc=float(input("Nhập thời gian cần tính:"))
+    val_r=r_expr.subs(t,t_calc)
+    val_v=v_expr.subs(t,t_calc)
+    if (val_r*val_v==0):
         print("Cos a không hợp lệ. Sử dụng giá trị cos a = 0.")
         cosa_expr=0.
     sina_expr=((1-cosa_expr**2)**0.5)
     L_expr = m_val *r_expr*v_expr*sina_expr
     L_expr_simplified = sp.simplify(L_expr)
-    #Tính toán và xuất ra kết quả
-    t_calc=float(input("Nhập thời gian cần tính:"))
-    val_v=v_expr.subs(t,t_calc)
     val_L=L_expr_simplified.subs(t,t_calc)
     print("Kết quả vận tốc ",val_v)
     print("Moment động lượng: ",val_L)
-
-    # --- 3. CHUẨN BỊ DỮ LIỆU ĐỂ VẼ ĐỒ THỊ ---
     
     print("--- 3. CHUẨN BỊ VẼ ĐỒ THỊ ---")
     try:
@@ -61,27 +53,17 @@ def main():
         print("Giá trị không hợp lệ. Sử dụng giá trị mặc định.")
         t_start, t_end, num_points = 0, 10, 500
 
-    # Tạo một mảng các giá trị 't' bằng NumPy
-    # np.linspace(start, end, num_points)
     t_values = np.linspace(t_start, t_end, num_points)
 
-    # Sử dụng sp.lambdify để chuyển biểu thức SymPy thành các hàm NumPy
-    # 'numpy' cho phép hàm tính toán nhanh trên toàn bộ mảng (array)
     func_x = sp.lambdify(t, x_expr, 'numpy')
     func_y = sp.lambdify(t, y_expr, 'numpy')
     func_L = sp.lambdify(t, L_expr_simplified, 'numpy')
 
-    # Tính toán các giá trị x, y, Lz tại tất cả các điểm t
     x_values = func_x(t_values)
     y_values = func_y(t_values)
     L_values = func_L(t_values)
 
-    # --- 4. VẼ ĐỒ THỊ ---
-
     print("Đang hiển thị đồ thị...")
-    
-    # Tạo một cửa sổ hình (figure) chứa 2 ô đồ thị (axes)
-    # 1 hàng, 2 cột. figsize là kích thước cửa sổ (rộng, cao)
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 7))
 
     # Đồ thị 1: Quỹ đạo (y theo x)
@@ -90,7 +72,7 @@ def main():
     ax1.set_xlabel("x", fontsize=12)
     ax1.set_ylabel("y", fontsize=12)
     ax1.grid(True)
-    ax1.set_aspect('equal', 'box') # Quan trọng: Giữ tỷ lệ x,y bằng nhau
+    ax1.set_aspect('equal', 'box') 
 
     # Đồ thị 2: Momen động lượng (L theo t)
     ax2.plot(t_values, L_values, color='red')
@@ -98,11 +80,7 @@ def main():
     ax2.set_xlabel("Thời gian t", fontsize=12)
     ax2.set_ylabel("Momen động lượng Lz", fontsize=12)
     ax2.grid(True)
-
-    # Tự động điều chỉnh layout cho đẹp
     plt.tight_layout()
-    
-    # Hiển thị đồ thị
     plt.show()
 
 if __name__ == "__main__":
