@@ -78,7 +78,7 @@ def main():
     ax2.plot(t_values, L_values, color='red')
     ax2.set_title(f"2. Momen động lượng (L theo t)", fontsize=14)
     ax2.set_xlabel("Thời gian t", fontsize=12)
-    ax2.set_ylabel("Momen động lượng Lz", fontsize=12)
+    ax2.set_ylabel("Momen động lượng L", fontsize=12)
     ax2.grid(True)
     plt.tight_layout()
     plt.show()
